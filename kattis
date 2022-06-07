@@ -1,0 +1,13 @@
+#!/bin/bash
+
+function kattis_getboard() {
+	curl -s https://tsukuba.kattis.com/courses/GB20602/2022_Spring/assignments/$1/standings | \
+		pup "tbody json{}" | \
+		jq ".[].children[:-4] | map({screenname: .children[0].children[0].href, name: .children[0].children[0].text, problems: [.children[2:][] | {state: .class, number: .children[0].children[1].text}]})" | \
+		sed -e "s/\ team_problem_cell//g"
+}
+
+weeks=($( curl -s https://tsukuba.kattis.com/courses/GB20602/2022_Spring | grep -oP "(?<=/assignments/)[a-z0-9]{6}(?=/problems)" | uniq ))
+week=$((${1}*2-2))
+
+kattis_getboard ${weeks[$1]}
