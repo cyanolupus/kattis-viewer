@@ -68,14 +68,19 @@ class Assignment:
         i = 0
         for td in soup.find_all('td'):
             attempts_span = td.find('span', {'class': 'standings-table-result-cell'})
+            judging = False
             if attempts_span != None:
-                attempts = int(attempts_span.get_text(strip=True).split('+')[0])
+                attemptslist = attempts_span.get_text(strip=True).split('+')
+                judging = len(attemptslist) == 2
+                attempts = int(attemptslist[0])
             else:
                 attempts = 0
             if 'class' not in td.attrs:
                 status = 'never'
             elif td['class'][0] in ['solved', 'attempted', 'first']:
                 status = td['class'][0]
+            elif judging:
+                status = 'judging'
             else:
                 continue
             problems.append(Problem(i, problem_names[i], status, attempts))
